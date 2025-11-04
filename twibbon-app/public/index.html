@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twibbon Image Processor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h1 class="title">ALVIAN SALIM</h1>
+  <p class="subtitle">PhotoGraphy</p>
+
+  <div class="popup-overlay" id="popupOverlay"></div>
+  <div class="popup" id="popup">
+    <img id="popupImage" src="" alt="">
+    <p id="popupText"></p>
+    <button class="close-btn" onclick="closePopup()">Close</button>
+  </div>
+
+  <!-- Upload Twibbon -->
+  <div class="upload-section" id="twibbonSection">
+    <h2>Upload Twibbon</h2>
+    <div id="twibbonDropZone" class="drop-zone">
+        <p>Drag & drop your Twibbon here or click to upload</p>
+        <input type="file" id="twibbonUpload" accept="image/*" style="display: none;">
+    </div>
+  </div>
+
+  <!-- Twibbon Preview (Centered) -->
+  <div id="twibbonPreviewContainer" class="twibbon-preview" style="display: none;">
+    <img id="twibbonPreview" src="" alt="Uploaded Twibbon">
+    <button id="deleteTwibbon"></button> <!-- Centered close button below -->
+  </div>
+
+  <!-- Upload Images -->
+  <div class="upload-section">
+    <h2>Upload Images</h2>
+    <div id="imageDropZone" class="drop-zone">
+      <p>Drag & drop your images here or click to upload</p>
+      <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;">
+    </div>
+  </div>
+
+  <!-- Process Images and Select Format -->
+  <div class="process-section">
+    <select id="imageFormat">
+      <option value="jpeg">JPEG</option>
+      <option value="png">PNG</option>
+      <option value="webp">WebP</option>
+    </select>
+    <button id="processImages">Process Images</button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>Processing images...</p>
+  </div>
+
+  <div class="preview-container" id="uploadedImagesContainer"></div>
+  <div class="preview-container" id="processedImagesContainer"></div>
+
+  <!-- Combined Container for Preview Processed Images and Select Printer -->
+  <div class="combined-container">
+    <h2>Select Printer</h2>
+    <div style="margin-top: 20px;">
+        <select id="printerSelect">
+            <option value="">Select a printer</option>
+        </select>
+        <button id="printImages">Print Images</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
