@@ -1,36 +1,49 @@
-// File: api/upload-twibbon.js
-
-import formidable from 'formidable';
-import fs from 'fs/promises';
+// api/upload-twibbon.js
+import { put } from '@vercel/blob';
 
 export const config = {
-  api: {
-    bodyParser: false, // Required for file uploads
-  },
+  runtime: 'edge', // Enables FormData and fast Edge runtime
 };
 
-export default async function handler(req, res) {
+export default async function handler(req) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
-  const form = formidable({ multiples: false });
-
   try {
-    const [fields, files] = await form.parse(req);
+    const formData = await req.formData();
+    const file = formData.get('twibbon');
 
-    const file = files.twibbon?.[0];
     if (!file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+      return new Response(JSON.stringify({ error: 'No file uploaded' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    // Just respond with filename (you can save it later)
-    return res.status(200).json({
-      message: 'File received!',
-      filename: file.originalFilename,
+    // Upload file to Vercel Blob
+    const blob = await put(file.name, file, {
+      access: 'public',
     });
-  } catch (err) {
-    console.error('Upload error:', err);
-    return res.status(500).json({ error: 'Upload failed' });
+
+    return new Response(
+      JSON.stringify({
+        message: 'Twibbon uploaded successfully!',
+        url: blob.url,
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Upload error:', error);
+    return new Response(JSON.stringify({ error: 'Upload failed' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
