@@ -106,37 +106,111 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-  
-    // Function to upload the Twibbon
-    async function uploadTwibbon() {
-      if (!twibbonUpload.files[0]) {
-        alert('Please select a Twibbon file.');
-        return;
-      }
-  
-      const file = twibbonUpload.files[0];
-      const formData = new FormData();
-      formData.append('twibbon', file);
-  
-      const response = await fetch('/upload-twibbon', {
-        method: 'POST',
-        body: formData,
-      });
-  
-      if (response.ok) {
-        const dropZone = document.getElementById('twibbonDropZone');
-        dropZone.innerHTML = ''; // Clear the drop zone content
-  
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        img.alt = 'Uploaded Twibbon';
-        img.style.width = '100px';
-        img.style.margin = '5px';
-        dropZone.appendChild(img);
-      } else {
-        alert('Failed to upload Twibbon.');
-      }
+
+async function uploadTwibbon() {
+  const twibbonUpload = document.getElementById('twibbonUpload');
+  const dropZone = document.getElementById('twibbonDropZone');
+  const processButton = document.getElementById('processImages');
+
+  if (!twibbonUpload.files[0]) {
+    alert('Please select a Twibbon file.');
+    return;
+  }
+
+  const file = twibbonUpload.files[0];
+  const formData = new FormData();
+  formData.append('twibbon', file);
+
+  // --- Create and show a loading indicator ---
+  const loadingMsg = document.createElement('p');
+  loadingMsg.innerText = '⏳ Uploading Twibbon...';
+  loadingMsg.style.fontSize = '14px';
+  loadingMsg.style.color = '#555';
+  dropZone.appendChild(loadingMsg);
+
+  // Disable button during upload
+  processButton.disabled = true;
+  processButton.style.opacity = 0.5;
+
+  try {
+    console.log('[Upload] Sending file to /api/upload-twibbon...');
+    const response = await fetch('/api/upload-twibbon', {
+      method: 'POST',
+      body: formData,
+    });
+
+    console.log('[Upload] Response status:', response.status);
+
+    let result;
+    try {
+      result = await response.json();
+    } catch {
+      result = { error: 'Response not in JSON format' };
     }
+
+    if (!response.ok) {
+      console.error('[Upload Error]', result);
+      alert(`Failed to upload Twibbon. Server responded with ${response.status}: ${result.error || 'Unknown error'}`);
+      return;
+    }
+
+    console.log('[Upload Success]', result);
+
+    // Clear previous content and show preview
+    dropZone.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = 'Uploaded Twibbon';
+    img.style.width = '100px';
+    img.style.margin = '5px';
+    dropZone.appendChild(img);
+
+    alert('✅ Twibbon uploaded successfully!');
+  } catch (error) {
+    console.error('[Upload Exception]', error);
+    alert(`An error occurred while uploading: ${error.message}`);
+  } finally {
+    // Remove loading message
+    loadingMsg.remove();
+
+    // Re-enable button
+    processButton.disabled = false;
+    processButton.style.opacity = 1;
+  }
+}
+
+
+  
+    // // Function to upload the Twibbon
+    // async function uploadTwibbon() {
+    //   if (!twibbonUpload.files[0]) {
+    //     alert('Please select a Twibbon file.');
+    //     return;
+    //   }
+  
+    //   const file = twibbonUpload.files[0];
+    //   const formData = new FormData();
+    //   formData.append('twibbon', file);
+  
+    //   const response = await fetch('/upload-twibbon', {
+    //     method: 'POST',
+    //     body: formData,
+    //   });
+  
+    //   if (response.ok) {
+    //     const dropZone = document.getElementById('twibbonDropZone');
+    //     dropZone.innerHTML = ''; // Clear the drop zone content
+  
+    //     const img = document.createElement('img');
+    //     img.src = URL.createObjectURL(file);
+    //     img.alt = 'Uploaded Twibbon';
+    //     img.style.width = '100px';
+    //     img.style.margin = '5px';
+    //     dropZone.appendChild(img);
+    //   } else {
+    //     alert('Failed to upload Twibbon.');
+    //   }
+    // }
   
   
       function previewUploadedImages() {
